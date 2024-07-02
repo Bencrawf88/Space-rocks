@@ -1,0 +1,57 @@
+[gd_scene load_steps=8 format=3 uid="uid://cfsk1lpnuq5ji"]
+
+[ext_resource type="Script" path="res://Player/player.gd" id="1_lfbfb"]
+[ext_resource type="Texture2D" uid="uid://bcgprfiu456ey" path="res://space_rocks_assets/assets/player_ship.png" id="1_xntku"]
+[ext_resource type="PackedScene" uid="uid://cvu7ysfq5ohu6" path="res://Bullet/bullet.tscn" id="2_bst18"]
+[ext_resource type="PackedScene" uid="uid://bj12i86kwuvqd" path="res://Explosion/explosion.tscn" id="4_boeio"]
+[ext_resource type="AudioStream" uid="uid://p5nh5lnqhbht" path="res://space_rocks_assets/assets/sounds/laser.ogg" id="5_y4aqy"]
+[ext_resource type="AudioStream" uid="uid://cen8j7o07y3te" path="res://space_rocks_assets/assets/sounds/engine.ogg" id="6_y4om6"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_lofmk"]
+radius = 32.0624
+
+[node name="Player" type="RigidBody2D"]
+position = Vector2(566, 294)
+collision_layer = 2
+collision_mask = 2
+max_contacts_reported = 1
+contact_monitor = true
+linear_damp = 2.0
+angular_damp = 5.0
+script = ExtResource("1_lfbfb")
+bullet_scene = ExtResource("2_bst18")
+metadata/_edit_group_ = true
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture_filter = 1
+rotation = 1.5708
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("1_xntku")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_lofmk")
+
+[node name="Muzzle" type="Marker2D" parent="."]
+position = Vector2(50, 0)
+
+[node name="GunCooldown" type="Timer" parent="."]
+one_shot = true
+autostart = true
+
+[node name="Explosion" parent="." instance=ExtResource("4_boeio")]
+visible = false
+
+[node name="InvulnerabilityTimer" type="Timer" parent="."]
+wait_time = 2.0
+one_shot = true
+
+[node name="LaserSound" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("5_y4aqy")
+
+[node name="EngineSound" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("6_y4om6")
+volume_db = -10.0
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="timeout" from="GunCooldown" to="." method="_on_gun_cooldown_timeout"]
+[connection signal="timeout" from="InvulnerabilityTimer" to="." method="_on_invulnerability_timer_timeout"]

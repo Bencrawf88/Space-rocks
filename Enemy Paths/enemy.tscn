@@ -1,0 +1,76 @@
+[gd_scene load_steps=10 format=3 uid="uid://dvn3kk84qj5f7"]
+
+[ext_resource type="Texture2D" uid="uid://lp2kbapwd7pg" path="res://space_rocks_assets/assets/enemy_saucer.png" id="1_amfgc"]
+[ext_resource type="Script" path="res://Enemy Paths/enemy.gd" id="1_x1132"]
+[ext_resource type="PackedScene" uid="uid://dvb4umgiaghmd" path="res://Enemy Paths/enemy_paths.tscn" id="2_7gp1q"]
+[ext_resource type="PackedScene" uid="uid://ca1il55h752n3" path="res://Enemy Paths/enemy_bullet.tscn" id="2_7iutq"]
+[ext_resource type="PackedScene" uid="uid://bj12i86kwuvqd" path="res://Explosion/explosion.tscn" id="3_v28wt"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_ciobk"]
+radius = 32.0
+
+[sub_resource type="Animation" id="Animation_fb8qi"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_6b2xn"]
+resource_name = "flash"
+length = 0.25
+step = 0.01
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.04, 0.08, 0.12, 0.16, 0.2, 0.24),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(0.919281, 4.47035e-06, 1.13249e-06, 1), Color(0.917647, 1, 1, 1), Color(0.917647, 0, 0, 1), Color(1, 1, 1, 1), Color(0.917647, 1.78814e-07, 1.78814e-07, 1), Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_7hj7w"]
+_data = {
+"RESET": SubResource("Animation_fb8qi"),
+"flash": SubResource("Animation_6b2xn")
+}
+
+[node name="Enemy" type="Area2D" groups=["enemies"]]
+process_mode = 1
+script = ExtResource("1_x1132")
+bullet_scene = ExtResource("2_7iutq")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_amfgc")
+hframes = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_ciobk")
+
+[node name="EnemyPaths" parent="." instance=ExtResource("2_7gp1q")]
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_7hj7w")
+}
+
+[node name="Explosion" parent="." instance=ExtResource("3_v28wt")]
+
+[node name="GunCooldown" type="Timer" parent="."]
+wait_time = 1.5
+autostart = true
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="timeout" from="GunCooldown" to="." method="_on_gun_cooldown_timeout"]

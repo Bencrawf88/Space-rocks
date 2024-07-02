@@ -1,0 +1,46 @@
+[gd_scene load_steps=8 format=3 uid="uid://clwnc5kpbap8m"]
+
+[ext_resource type="Script" path="res://Main/main.gd" id="1_pint5"]
+[ext_resource type="Texture2D" uid="uid://3p6yfh8jic2v" path="res://space_rocks_assets/assets/space_background.png" id="1_u2a6x"]
+[ext_resource type="PackedScene" uid="uid://cfsk1lpnuq5ji" path="res://Player/player.tscn" id="2_ia03y"]
+[ext_resource type="PackedScene" uid="uid://bn03ktl1gy22u" path="res://Rock/rock.tscn" id="2_ksp40"]
+[ext_resource type="PackedScene" uid="uid://dvn3kk84qj5f7" path="res://Enemy Paths/enemy.tscn" id="3_btdpg"]
+[ext_resource type="PackedScene" uid="uid://b0a2lcsis6o4s" path="res://HUD'/hud.tscn" id="5_pbhaw"]
+
+[sub_resource type="Curve2D" id="Curve2D_xftad"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 1153, 1, 0, 0, 0, 0, 1150, 644, 0, 0, 0, 0, 1, 644)
+}
+point_count = 4
+
+[node name="Main" type="Node"]
+process_mode = 3
+script = ExtResource("1_pint5")
+rock_scene = ExtResource("2_ksp40")
+enemy_scene = ExtResource("3_btdpg")
+
+[node name="Background" type="Sprite2D" parent="."]
+position = Vector2(576.5, 324.5)
+scale = Vector2(0.599479, 0.599074)
+texture = ExtResource("1_u2a6x")
+
+[node name="Player" parent="." instance=ExtResource("2_ia03y")]
+
+[node name="RockPath" type="Path2D" parent="."]
+curve = SubResource("Curve2D_xftad")
+
+[node name="RockSpawn" type="PathFollow2D" parent="RockPath"]
+position = Vector2(1, 2)
+rotation = -0.000868055
+
+[node name="HUD" parent="." instance=ExtResource("5_pbhaw")]
+
+[node name="EnemyTimer" type="Timer" parent="."]
+wait_time = 0.1
+one_shot = true
+
+[connection signal="dead" from="Player" to="." method="game_over"]
+[connection signal="lives_changed" from="Player" to="HUD" method="update_lives"]
+[connection signal="shield_changed" from="Player" to="HUD" method="update_shield"]
+[connection signal="start_game" from="HUD" to="." method="new_game"]
+[connection signal="timeout" from="EnemyTimer" to="." method="_on_enemy_timer_timeout"]
